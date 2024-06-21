@@ -1,1 +1,3 @@
-# task_management_server
+# Task Management Server
+
+A task management server implemented with Go
