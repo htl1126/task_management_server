@@ -23,6 +23,12 @@ func main() {
 
 func initRouter() *gin.Engine {
 	router := gin.Default()
+
+	// health check
 	router.GET("/healthCheck", api.HealthCheck)
+
+	// task management APIs
+	router.POST("/tasks", api.CreateTask)
+
 	return router
 }
