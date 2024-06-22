@@ -23,6 +23,7 @@ func main() {
 
 	// we might need gracefully shutdown
 	// need to deal with panic?
+	// custom errors?
 }
 
 func initRouter() *gin.Engine {
@@ -34,6 +35,7 @@ func initRouter() *gin.Engine {
 	// task management APIs
 	router.POST("/tasks", api.CreateTask)
 	router.GET("/tasks", api.GetTasks)
+	router.PUT("/tasks/:id", api.UpdateTask)
 
 	return router
 }

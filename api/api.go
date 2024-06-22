@@ -3,6 +3,7 @@ package api
 import (
 	"fmt"
 	"net/http"
+	"strconv"
 	"task-manage-api/model"
 	"task-manage-api/storage"
 
@@ -25,6 +26,7 @@ func CreateTask(c *gin.Context) {
 	// create an in-memory task item
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": "Incorrect request content"})
+		return
 	}
 	taskItem := storage.CreateTaskItem(taskID, req.Name, model.Incompleted) // create a task with incompleted status by default
 	storage.StorageMgr.WriteToTaskPool(taskItem)
@@ -47,4 +49,44 @@ func GetTasks(c *gin.Context) {
 		"message":   fmt.Sprintf("%d task(s) in total", len(taskList)),
 		"task_list": taskList,
 	})
+}
+
+func UpdateTask(c *gin.Context) {
+	var (
+		req model.UpdateReq
+		err error
+	)
+
+	idStr := c.Param("id")
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": "Invalid task ID"})
+		return
+	}
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": "Incorrect request content"})
+		return
+	}
+
+	if !storage.StorageMgr.TaskPoolHasID(id) {
+		c.JSON(http.StatusOK, gin.H{"message": "task not found"})
+		return
+	}
+
+	if req.Name == nil && req.Status == nil {
+		c.JSON(http.StatusOK, gin.H{"message": "name and status are not given, updated nothing"})
+		return
+	}
+
+	taskItem := storage.StorageMgr.GetTaskItemByID(id)
+	if req.Name != nil {
+		taskItem.Name = *req.Name
+	}
+	if req.Status != nil {
+		taskItem.Status = *req.Status
+	}
+	storage.StorageMgr.WriteToTaskPool(taskItem)
+
+	c.JSON(http.StatusOK, gin.H{"message": "task updated successfully"})
 }

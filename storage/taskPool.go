@@ -67,3 +67,14 @@ func (s *Storage) GetTaskID() int {
 func (s *Storage) WriteToTaskPool(item model.TaskItem) { // need to check if id has already existed?
 	s.TaskItems[item.ID] = item // need to test?
 }
+
+func (s Storage) TaskPoolHasID(id int) bool { // need to test
+	if _, ok := s.TaskItems[id]; ok {
+		return true
+	}
+	return false
+}
+
+func (s Storage) GetTaskItemByID(id int) model.TaskItem {
+	return s.TaskItems[id]
+}
