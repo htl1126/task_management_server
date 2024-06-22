@@ -33,6 +33,7 @@ func initRouter() *gin.Engine {
 
 	// task management APIs
 	router.POST("/tasks", api.CreateTask)
+	router.GET("/tasks", api.GetTasks)
 
 	return router
 }

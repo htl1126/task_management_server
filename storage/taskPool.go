@@ -28,8 +28,12 @@ func (s *Storage) InitTaskIDPool() {
 	}
 }
 
-func (s *Storage) GetTaskIDPool() map[int]struct{} {
+func (s Storage) GetTaskIDPool() map[int]struct{} {
 	return s.TaskIDPool
+}
+
+func (s Storage) GetTaskItems() map[int]model.TaskItem {
+	return s.TaskItems
 }
 
 func (s Storage) GetTaskIDPoolSize() int {

@@ -32,3 +32,19 @@ func CreateTask(c *gin.Context) {
 	// respond with task ID
 	c.JSON(http.StatusOK, gin.H{"message": fmt.Sprintf("a task was created successfully with ID %d", taskID)})
 }
+
+func GetTasks(c *gin.Context) {
+	taskItems := storage.StorageMgr.GetTaskItems()
+
+	taskList := make(model.TaskItemList, len(taskItems))
+	idx := 0
+	for _, v := range taskItems {
+		taskList[idx] = v
+		idx += 1
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message":   fmt.Sprintf("%d task(s) in total", len(taskList)),
+		"task_list": taskList,
+	})
+}
