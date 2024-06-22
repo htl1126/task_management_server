@@ -90,3 +90,22 @@ func UpdateTask(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"message": "task updated successfully"})
 }
+
+func DeleteTask(c *gin.Context) {
+	idStr := c.Param("id")
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": "Invalid task ID"})
+		return
+	}
+
+	if !storage.StorageMgr.TaskPoolHasID(id) {
+		c.JSON(http.StatusOK, gin.H{"message": "task not found"})
+		return
+	}
+
+	storage.StorageMgr.DeleteFromTaskPool(id)
+	storage.StorageMgr.RecycleTaskID(id)
+
+	c.JSON(http.StatusOK, gin.H{"message": "task deleted successfully"})
+}

@@ -36,6 +36,7 @@ func initRouter() *gin.Engine {
 	router.POST("/tasks", api.CreateTask)
 	router.GET("/tasks", api.GetTasks)
 	router.PUT("/tasks/:id", api.UpdateTask)
+	router.DELETE("/tasks/:id", api.DeleteTask)
 
 	return router
 }

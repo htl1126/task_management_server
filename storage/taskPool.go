@@ -78,3 +78,11 @@ func (s Storage) TaskPoolHasID(id int) bool { // need to test
 func (s Storage) GetTaskItemByID(id int) model.TaskItem {
 	return s.TaskItems[id]
 }
+
+func (s *Storage) DeleteFromTaskPool(id int) {
+	delete(s.TaskItems, id)
+}
+
+func (s *Storage) RecycleTaskID(id int) { // need to test
+	s.TaskIDPool[id] = struct{}{}
+}
