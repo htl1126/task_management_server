@@ -1,4 +1,4 @@
-module example.com/m/v2
+module task-manage-api
 
 go 1.18
 

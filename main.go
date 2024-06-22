@@ -4,6 +4,8 @@ import (
 	"log/slog"
 	"os"
 
+	"task-manage-api/api"
+
 	"github.com/gin-gonic/gin"
 )
 
@@ -21,10 +23,6 @@ func main() {
 
 func initRouter() *gin.Engine {
 	router := gin.Default()
-	router.GET("/healthCheck", healthCheck)
+	router.GET("/healthCheck", api.HealthCheck)
 	return router
-}
-
-func healthCheck(c *gin.Context) {
-	c.JSON(200, gin.H{"message": "server is running and healthy"})
 }
