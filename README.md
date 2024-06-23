@@ -21,6 +21,8 @@ I used `gin-gonic` to build the server. Besides the `main` package, other packag
 Most logic is in package `storage`, so tests in `unittest` are mainly
 for testing the code of package `storage`.
 
+TMS stores tasks in the memory. We can set the task pool size with `TASKPOOLSIZE` attribute in `Dockerfile`.
+
 ## Build and run
 
 We can directly run TMS by going to the project root directory.
@@ -39,6 +41,14 @@ And run the server with,
 
 ```
 sudo docker run --rm -d -p 8080:8080 api_server
+```
+
+## Unit test
+
+We can use the following command to run all the tests with detailed results
+
+```
+go test ./... -v
 ```
 
 ## Usage
