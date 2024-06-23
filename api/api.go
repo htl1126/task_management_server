@@ -29,14 +29,14 @@ func CreateTask(c *gin.Context) {
 		return
 	}
 	taskItem := storage.CreateTaskItem(taskID, req.Name, model.Incompleted) // create a task with incompleted status by default
-	storage.StorageMgr.WriteToTaskPool(taskItem)
+	storage.StorageMgr.WriteToTaskPool(taskItem)                            // task ID was newly generated, it's safe to write to the pool
 
 	// respond with task ID
 	c.JSON(http.StatusOK, gin.H{"message": fmt.Sprintf("a task was created successfully with ID %d", taskID)})
 }
 
 func GetTasks(c *gin.Context) {
-	taskItems := storage.StorageMgr.GetTaskItems()
+	taskItems := storage.StorageMgr.GetTaskPool()
 
 	taskList := make(model.TaskItemList, len(taskItems))
 	idx := 0
@@ -86,7 +86,7 @@ func UpdateTask(c *gin.Context) {
 	if req.Status != nil {
 		taskItem.Status = *req.Status
 	}
-	storage.StorageMgr.WriteToTaskPool(taskItem)
+	storage.StorageMgr.WriteToTaskPool(taskItem) // the task ID was obtained from the pool, so we can write back to it
 
 	c.JSON(http.StatusOK, gin.H{"message": "task updated successfully"})
 }

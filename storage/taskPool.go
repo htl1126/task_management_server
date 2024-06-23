@@ -8,7 +8,7 @@ var StorageMgr Storage
 type Storage struct {
 	PoolSize   int
 	TaskIDPool map[int]struct{}
-	TaskItems  map[int]model.TaskItem
+	TaskPool   map[int]model.TaskItem
 }
 
 func NewStorageInstance() Storage {
@@ -21,7 +21,7 @@ func (s *Storage) SetTaskPoolSize(size int) {
 
 func (s *Storage) InitTaskIDPool() {
 	s.TaskIDPool = make(map[int]struct{}, s.PoolSize)
-	s.TaskItems = make(map[int]model.TaskItem)
+	s.TaskPool = make(map[int]model.TaskItem)
 
 	for i := 0; i < s.PoolSize; i += 1 {
 		s.TaskIDPool[i] = struct{}{}
@@ -32,8 +32,8 @@ func (s Storage) GetTaskIDPool() map[int]struct{} {
 	return s.TaskIDPool
 }
 
-func (s Storage) GetTaskItems() map[int]model.TaskItem {
-	return s.TaskItems
+func (s Storage) GetTaskPool() map[int]model.TaskItem {
+	return s.TaskPool
 }
 
 func (s Storage) GetTaskIDPoolSize() int {
@@ -64,25 +64,25 @@ func (s *Storage) GetTaskID() int {
 	return taskID
 }
 
-func (s *Storage) WriteToTaskPool(item model.TaskItem) { // need to check if id has already existed?
-	s.TaskItems[item.ID] = item // need to test?
+func (s *Storage) WriteToTaskPool(item model.TaskItem) {
+	s.TaskPool[item.ID] = item
 }
 
-func (s Storage) TaskPoolHasID(id int) bool { // need to test
-	if _, ok := s.TaskItems[id]; ok {
+func (s Storage) TaskPoolHasID(id int) bool {
+	if _, ok := s.TaskPool[id]; ok {
 		return true
 	}
 	return false
 }
 
 func (s Storage) GetTaskItemByID(id int) model.TaskItem {
-	return s.TaskItems[id]
+	return s.TaskPool[id]
 }
 
 func (s *Storage) DeleteFromTaskPool(id int) {
-	delete(s.TaskItems, id)
+	delete(s.TaskPool, id)
 }
 
-func (s *Storage) RecycleTaskID(id int) { // need to test
+func (s *Storage) RecycleTaskID(id int) {
 	s.TaskIDPool[id] = struct{}{}
 }
