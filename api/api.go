@@ -70,12 +70,7 @@ func UpdateTask(c *gin.Context) {
 	}
 
 	if !storage.StorageMgr.TaskPoolHasID(id) {
-		c.JSON(http.StatusOK, gin.H{"message": "task not found"})
-		return
-	}
-
-	if req.Name == nil && req.Status == nil {
-		c.JSON(http.StatusOK, gin.H{"message": "name and status are not given, updated nothing"})
+		c.JSON(http.StatusNotFound, gin.H{"message": "task not found"})
 		return
 	}
 
@@ -100,7 +95,7 @@ func DeleteTask(c *gin.Context) {
 	}
 
 	if !storage.StorageMgr.TaskPoolHasID(id) {
-		c.JSON(http.StatusOK, gin.H{"message": "task not found"})
+		c.JSON(http.StatusNotFound, gin.H{"message": "task not found"})
 		return
 	}
 

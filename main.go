@@ -75,7 +75,6 @@ func main() {
 	}
 
 	// need to deal with panic?
-	// custom errors?
 	Logger.Info("the server has been shutdown")
 }
 
