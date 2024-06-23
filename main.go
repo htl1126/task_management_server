@@ -40,7 +40,12 @@ func main() {
 
 	Logger.Info("the server is going to run")
 	svr := initRouter()
-	svr.Run(":8000")
+	serverPort := os.Getenv("SERVERPORT")
+	if serverPort != "" {
+		svr.Run(":" + serverPort)
+	} else {
+		svr.Run(":8080")
+	}
 
 	// we might need gracefully shutdown
 	// need to deal with panic?
