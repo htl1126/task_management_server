@@ -1,8 +1,10 @@
 package main
 
 import (
+	"fmt"
 	"log/slog"
 	"os"
+	"strconv"
 
 	"task-manage-api/api"
 	"task-manage-api/storage"
@@ -17,7 +19,22 @@ func main() {
 	Logger.Info("logger launched")
 
 	storage.StorageMgr = storage.NewStorageInstance()
-	storage.StorageMgr.SetTaskPoolSize(100) // PoolSize should be from dockerfile
+	// try to get task pool size from the environment variable
+	// we will use 100 if can't get the value correctly
+	taskPoolSizeStr := os.Getenv("TASKPOOLSIZE")
+	if taskPoolSizeStr == "" {
+		storage.StorageMgr.SetTaskPoolSize(100)
+		Logger.Info("task pool size set to 100")
+	} else {
+		taskPoolSize, err := strconv.Atoi(taskPoolSizeStr)
+		if err != nil {
+			storage.StorageMgr.SetTaskPoolSize(100)
+			Logger.Info("task pool size set to 100")
+		} else {
+			storage.StorageMgr.SetTaskPoolSize(taskPoolSize)
+			Logger.Info(fmt.Sprintf("task pool size set to %d", taskPoolSize))
+		}
+	}
 	storage.StorageMgr.InitTaskIDPool()
 	Logger.Info("storage is ready")
 
