@@ -1,10 +1,15 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"log/slog"
+	"net/http"
 	"os"
+	"os/signal"
 	"strconv"
+	"syscall"
+	"time"
 
 	"task-manage-api/api"
 	"task-manage-api/storage"
@@ -38,16 +43,37 @@ func main() {
 	storage.StorageMgr.InitTaskIDPool()
 	Logger.Info("storage is ready")
 
-	Logger.Info("the server is going to run")
-	svr := initRouter()
+	Logger.Info("the server is going to start")
+	router := initRouter()
+
 	serverPort := os.Getenv("SERVERPORT")
 	if serverPort != "" {
-		svr.Run(":" + serverPort)
+		serverPort = ":" + serverPort
 	} else {
-		svr.Run(":8080")
+		serverPort = ":8000"
+	}
+	srv := &http.Server{
+		Addr:    serverPort,
+		Handler: router,
 	}
 
-	// we might need gracefully shutdown
+	go func() {
+		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			Logger.Error(fmt.Sprintf("listen: %v", err))
+		}
+	}()
+
+	ch := make(chan os.Signal, 1)
+	signal.Notify(ch, syscall.SIGINT, syscall.SIGTERM)
+	<-ch
+	Logger.Info("Server is going to shutdown")
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	if err := srv.Shutdown(ctx); err != nil {
+		Logger.Error(fmt.Sprintf("Server shutdown: %v", err))
+	}
+
 	// need to deal with panic?
 	// custom errors?
 	Logger.Info("the server has been shutdown")
