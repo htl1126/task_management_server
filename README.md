@@ -17,6 +17,7 @@ I used `gin-gonic` to build the server. Besides the `main` package, other packag
 | `model`   | data, request and response definitions |
 | `storage` | task pool logic                        |
 | `unittest`| unit tests                             |
+| `logger`  | logger                                 |
 
 Most logic is in package `storage`, so tests in `unittest` are mainly
 for testing the code of package `storage`.
