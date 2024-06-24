@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"task-manage-api/logger"
 	"task-manage-api/model"
 	"task-manage-api/storage"
 
@@ -20,11 +21,13 @@ func CreateTask(c *gin.Context) {
 	// get a task number from the ID pool
 	taskID := storage.StorageMgr.GetTaskID()
 	if taskID == -1 {
+		logger.Logger.Error("Cannot create a new task")
 		c.JSON(500, gin.H{"message": "Cannot create a new task"})
 	}
 
 	// create an in-memory task item
 	if err := c.ShouldBindJSON(&req); err != nil {
+		logger.Logger.Error("Incorrect request content")
 		c.JSON(http.StatusBadRequest, gin.H{"message": "Incorrect request content"})
 		return
 	}
@@ -60,16 +63,19 @@ func UpdateTask(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
+		logger.Logger.Error("Invalid task ID in update request")
 		c.JSON(http.StatusBadRequest, gin.H{"message": "Invalid task ID"})
 		return
 	}
 
 	if err := c.ShouldBindJSON(&req); err != nil {
+		logger.Logger.Error("Incorrect request content in update request")
 		c.JSON(http.StatusBadRequest, gin.H{"message": "Incorrect request content"})
 		return
 	}
 
 	if !storage.StorageMgr.TaskPoolHasID(id) {
+		logger.Logger.Error("task not found for update request")
 		c.JSON(http.StatusNotFound, gin.H{"message": "task not found"})
 		return
 	}
@@ -90,11 +96,13 @@ func DeleteTask(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
+		logger.Logger.Error("Invalid task ID in delete request")
 		c.JSON(http.StatusBadRequest, gin.H{"message": "Invalid task ID"})
 		return
 	}
 
 	if !storage.StorageMgr.TaskPoolHasID(id) {
+		logger.Logger.Error("task not found for delete request")
 		c.JSON(http.StatusNotFound, gin.H{"message": "task not found"})
 		return
 	}

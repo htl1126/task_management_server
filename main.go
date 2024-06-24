@@ -12,16 +12,15 @@ import (
 	"time"
 
 	"task-manage-api/api"
+	"task-manage-api/logger"
 	"task-manage-api/storage"
 
 	"github.com/gin-gonic/gin"
 )
 
-var Logger *slog.Logger
-
 func main() {
-	Logger = slog.New(slog.NewTextHandler(os.Stdout, nil))
-	Logger.Info("logger launched")
+	logger.Logger = slog.New(slog.NewTextHandler(os.Stdout, nil))
+	logger.Logger.Info("logger launched")
 
 	storage.StorageMgr = storage.NewStorageInstance()
 	// try to get task pool size from the environment variable
@@ -29,21 +28,21 @@ func main() {
 	taskPoolSizeStr := os.Getenv("TASKPOOLSIZE")
 	if taskPoolSizeStr == "" {
 		storage.StorageMgr.SetTaskPoolSize(100)
-		Logger.Info("task pool size set to 100")
+		logger.Logger.Info("task pool size set to 100")
 	} else {
 		taskPoolSize, err := strconv.Atoi(taskPoolSizeStr)
 		if err != nil {
 			storage.StorageMgr.SetTaskPoolSize(100)
-			Logger.Info("task pool size set to 100")
+			logger.Logger.Info("task pool size set to 100")
 		} else {
 			storage.StorageMgr.SetTaskPoolSize(taskPoolSize)
-			Logger.Info(fmt.Sprintf("task pool size set to %d", taskPoolSize))
+			logger.Logger.Info(fmt.Sprintf("task pool size set to %d", taskPoolSize))
 		}
 	}
 	storage.StorageMgr.InitTaskIDPool()
-	Logger.Info("storage is ready")
+	logger.Logger.Info("storage is ready")
 
-	Logger.Info("the server is going to start")
+	logger.Logger.Info("the server is going to start")
 	router := initRouter()
 
 	serverPort := os.Getenv("SERVERPORT")
@@ -59,28 +58,27 @@ func main() {
 
 	go func() {
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			Logger.Error(fmt.Sprintf("listen: %v", err))
+			logger.Logger.Error(fmt.Sprintf("listen: %v", err))
 		}
 	}()
 
 	ch := make(chan os.Signal, 1)
 	signal.Notify(ch, syscall.SIGINT, syscall.SIGTERM)
 	<-ch
-	Logger.Info("Server is going to shutdown")
+	logger.Logger.Info("Server is going to shutdown")
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	if err := srv.Shutdown(ctx); err != nil {
-		Logger.Error(fmt.Sprintf("Server shutdown: %v", err))
+		logger.Logger.Error(fmt.Sprintf("Server shutdown: %v", err))
 	}
 
-	// need to deal with panic?
-	Logger.Info("the server has been shutdown")
+	logger.Logger.Info("the server has been shutdown")
 }
 
 func initRouter() *gin.Engine {
 	router := gin.Default()
-	Logger.Info("start registering API routes")
+	logger.Logger.Info("start registering API routes")
 
 	// health check
 	router.GET("/healthCheck", api.HealthCheck)
@@ -91,6 +89,6 @@ func initRouter() *gin.Engine {
 	router.PUT("/tasks/:id", api.UpdateTask)
 	router.DELETE("/tasks/:id", api.DeleteTask)
 
-	Logger.Info("routes were registered successfully")
+	logger.Logger.Info("routes were registered successfully")
 	return router
 }
