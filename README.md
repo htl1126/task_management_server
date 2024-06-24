@@ -31,13 +31,13 @@ We can directly run TMS by going to the project root directory.
 go run main.go
 ```
 
-Or we can run TMS inside a docker container. We can firstly build the docker image with,
+Or we can run TMS inside a docker container. We can firstly build the docker image with the following command. If you get stuck with I/O timeout issues, you can try to restart the host system.
 
 ```
 sudo docker build -t api_server .
 ```
 
-And run the server with,
+And run the server with the following command. You can change `8080` to other ports you prefer and change the value in `Dockerfile` accordingly.
 
 ```
 sudo docker run --rm -d -p 8080:8080 api_server
